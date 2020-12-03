@@ -31,6 +31,7 @@ function App() {
   const [callerSignal, setCallerSignal] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
   const [count, setCount] = useState(0);
+  const [obj_count, setobj_count] = useState(0);
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
@@ -59,41 +60,49 @@ function App() {
   }, []);
 
   function callPeer(id) {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      config: {
 
-        iceServers: [
-            {
-                urls: "stun:numb.viagenie.ca",
-                username: "socket.io",
-                credential: "98376683"
-            },
-            {
-                urls: "turn:numb.viagenie.ca",
-                username: "socket.io",
-                credential: "98376683"
-            }
-        ]
-    },
-      stream: stream,
-    });
-
-    peer.on("signal", data => {
-      socket.current.emit("callUser", { userToCall: id, signalData: data, from: yourID })
-    })
-
-    peer.on("stream", stream => {
-      if (partnerVideo.current) {
-        partnerVideo.current.srcObject = stream;
-      }
-    });
-
-    socket.current.on("callAccepted", signal => {
-      setCallAccepted(true);
-      peer.signal(signal);
-    })
+    setobj_count(obj_count + 1);
+    if(obj_count === 0){
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        config: {
+  
+          iceServers: [
+              {
+                  urls: "stun:numb.viagenie.ca",
+                  username: "socket.io",
+                  credential: "98376683"
+              },
+              {
+                  urls: "turn:numb.viagenie.ca",
+                  username: "socket.io",
+                  credential: "98376683"
+              }
+          ]
+      },
+        stream: stream,
+      });
+  
+      peer.on("signal", data => {
+        socket.current.emit("callUser", { userToCall: id, signalData: data, from: yourID })
+      })
+  
+      peer.on("stream", stream => {
+        if (partnerVideo.current) {
+          partnerVideo.current.srcObject = stream;
+        }
+      });
+  
+      socket.current.on("callAccepted", signal => {
+        setCallAccepted(true);
+        peer.signal(signal);
+      })
+    }
+    else {
+      alert("network busy");
+    }
+   
 
   }
 
@@ -112,8 +121,7 @@ function App() {
         socket.current.emit("acceptCall", { signal: data, to: caller })
       } else {
         console.log('You Have Already Accepted the Call');
-      }
-      
+      }      
     })
 
     peer.on("stream", stream => {
