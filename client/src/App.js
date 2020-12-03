@@ -67,12 +67,12 @@ function App() {
         iceServers: [
             {
                 urls: "stun:numb.viagenie.ca",
-                username: "sultan1640@gmail.com",
+                username: "socket.io",
                 credential: "98376683"
             },
             {
                 urls: "turn:numb.viagenie.ca",
-                username: "sultan1640@gmail.com",
+                username: "socket.io",
                 credential: "98376683"
             }
         ]
@@ -134,7 +134,7 @@ function App() {
     incomingCall = (
       <div>
         <h1>{caller} is calling you</h1>
-        <button onClick={acceptCall}>Accept</button>
+    <button onClick={acceptCall}>Accept Call from {caller}</button>
       </div>
     )
   }
