@@ -3,6 +3,9 @@ import './App.css';
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
+import Button from 'react-bootstrap/Button';
+import './loader.css';
+import { Link } from 'react-router-dom';
 
 const Container = styled.div`
   height: 100vh;
@@ -22,7 +25,9 @@ const Video = styled.video`
   height: 50%;
 `;
 
+
 function Loader() {
+  const flag=0;  
   const [yourID, setYourID] = useState("");
   const [users, setUsers] = useState({});
   const [stream, setStream] = useState();
@@ -60,13 +65,9 @@ function Loader() {
   }, []);
 
   function callPeer(id) {
-    if(obj_count > 0){
-      window.close();// need to change
-
-    }
-    else {
       setobj_count(obj_count + 1);
-      if(obj_count === 0){
+      console.log(obj_count);
+      if(obj_count === 0 ){
         const peer = new Peer({
           initiator: true,
           trickle: false,
@@ -108,8 +109,6 @@ function Loader() {
       }
     }
     
-
-  }
 
   function acceptCall() {
     
@@ -153,9 +152,11 @@ function Loader() {
   let incomingCall;
   if (receivingCall && count === 0) {
     incomingCall = (
-      <div>
-        <h1>{caller} is calling you</h1>
-    <button onClick={acceptCall}>Accept Call from {caller}</button>
+        <div class="container">
+        <div class="vertical-center">
+            <h1>{caller} is calling you</h1>
+            <Button className="mb-2" size="lg" variant="success"  onClick={acceptCall}>Accept Call from {caller}</Button>
+        </div>
       </div>
     )
   }
@@ -171,12 +172,26 @@ function Loader() {
             return null;
           }
           return (
-            <button onClick={() => callPeer(key)}>Call {key}</button>
+            <Button className="mb-2" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button>
           );
         })}
       </Row>
       <Row>
         {incomingCall}
+      </Row>
+      <Row>
+        <Button variant="secondary" size="lg" active onClick={() => 
+        stream.getTracks().forEach((track) => {
+            track.stop();
+        })}>
+             Decline Calling 
+        </Button>
+        </Row>
+
+        <Row>
+        <Button variant="secondary" size="lg" active>
+                <Link to="/" color="white">Back To The Main Page.</Link>
+        </Button>
       </Row>
       
     </Container>
