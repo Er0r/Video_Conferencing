@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
     <div className="App">
       <Switch>
-        <Route exact path="/" component={Homepage}></Route>
+        <Route exact path="/" component={Homepage}></Route> {/*React router is for link. Sir, you have worked with node and express, it's like app.get('/',) at nodejs */}
         <Route path="/load" component={Loader}></Route>
       </Switch>
     </div>
