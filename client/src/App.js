@@ -30,7 +30,7 @@ function App() {
   const [caller, setCaller] = useState("");
   const [callerSignal, setCallerSignal] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
-
+  const [count, setCount] = useState(0);
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
@@ -98,6 +98,7 @@ function App() {
   }
 
   function acceptCall() {
+    
     setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
@@ -105,7 +106,14 @@ function App() {
       stream: stream,
     });
     peer.on("signal", data => {
-      socket.current.emit("acceptCall", { signal: data, to: caller })
+      setCount(count+1);
+      if(count === 0){
+        console.log('Call is Accepted'+' '+ count);
+        socket.current.emit("acceptCall", { signal: data, to: caller })
+      } else {
+        console.log('You Have Already Accepted the Call');
+      }
+      
     })
 
     peer.on("stream", stream => {
@@ -130,7 +138,7 @@ function App() {
   }
 
   let incomingCall;
-  if (receivingCall) {
+  if (receivingCall && count === 0) {
     incomingCall = (
       <div>
         <h1>{caller} is calling you</h1>
