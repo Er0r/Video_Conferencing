@@ -31,6 +31,9 @@ io.on('connection', socket => { // handle the event send with socket.send() from
     socket.on("acceptCall", (data) => {
         io.to(data.to).emit('callAccepted', data.signal);
     })
+    socket.on("send message", body => {
+        io.emit("message", body)
+    })
 });
 
 server.listen(8000, () => console.log('server is running on port 8000')); // Server is up on localhost port 8000. You can change this with your own server port Sir
