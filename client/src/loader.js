@@ -29,7 +29,7 @@ const Video = styled.video`
 
 
 function Loader() {
-  const flag=0;  
+  
   const [yourID, setYourID] = useState(""); // React hooks is used to define random id's
   const [users, setUsers] = useState({}); // React hooks for tracking the concurrent users
   const [stream, setStream] = useState(); // React hooks is used to define steam data
@@ -42,6 +42,7 @@ function Loader() {
   const userVideo = useRef(); 
   const partnerVideo = useRef(); 
   const socket = useRef(); 
+  const peerRef = useRef();
 
   // useefect is the most vital part of this code. This part will execute first. So, firstly in this section, socket will get connected with media parts(camera,sound)//
   useEffect(() => {
@@ -65,7 +66,24 @@ function Loader() {
       setCaller(data.from);
       setCallerSignal(data.signal);
     })
+
+    socket.current.on("user left", () => {
+      setReceivingCall(false);
+      setCaller("");
+      setCallAccepted(false);
+      setUsers({});
+      peerRef.current.destroy();
+    });
   }, []);
+  
+
+  
+
+  function Exit() {
+    window.open("/", "_self");
+    window.close();
+  }
+
 
   function callPeer(id) {
       setobj_count(obj_count + 1);
@@ -105,6 +123,7 @@ function Loader() {
           setCallAccepted(true);
           peer.signal(signal);
         })
+        peerRef.current = peer;
       }
       
       else { // If he isn't in the connection, show network busy or any interruption 
@@ -182,21 +201,20 @@ function Loader() {
       <Row>
         {incomingCall} {/* Show the upcoming Call Message */}
       </Row>
-      <Row> 
-        <Button variant="secondary" size="lg" active onClick={() => 
-        stream.getTracks().forEach((track) => { // those are for declining the call. it will stop your mic and video after your conversation is over. //
-            track.stop();
-        })}>
-             Decline Calling 
-        </Button>
-        </Row>
+      
 
         <Row>
         <Button variant="secondary" size="lg" active>
                 <Link to="/" color="white">Back To The Main Page.</Link> {/* back to the previous page */}
         </Button>
       </Row>
-      
+      {/* ADD CLOSE BROWSER OPTION */}
+      <Row>
+        <div>
+          <Button onClick={Exit}>Disconnect Browser</Button>
+        </div>
+      </Row>
+
     </Container>
   );
 }
