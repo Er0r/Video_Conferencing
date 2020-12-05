@@ -6,8 +6,7 @@ import Peer from "simple-peer";
 import styled from "styled-components";
 import Button from 'react-bootstrap/Button';
 import './loader.css';
-import { Link } from 'react-router-dom';
-
+import Chat from './chat';
 // Some basic styling...
 const Container = styled.div`
   height: 120vh;
@@ -209,7 +208,9 @@ function Loader() {
         {incomingCall} {/* Show the upcoming Call Message */}
       </Row>
       {/* ADD CLOSE BROWSER OPTION */}
-      
+      <Row>
+        <Chat />
+      </Row>
 
     </Container>
   );
