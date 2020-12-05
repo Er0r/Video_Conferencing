@@ -92,43 +92,43 @@ const PartnerMessage = styled.div`
   border-bottom-left-radius: 10%;
 `;
 
-
+// useRef returns a mutable ref object whose .current property is initialized to the passed argument (initialValue).
 
 function Loader() {
-  const [yourID, setYourID] = useState();
   
-  const [users, setUsers] = useState({}); 
-  const [stream, setStream] = useState(); 
-  const [receivingCall, setReceivingCall] = useState(false); 
-  const [caller, setCaller] = useState(""); 
+  const [yourID, setYourID] = useState(); // react hooks to store your id
+  const [users, setUsers] = useState({}); // initialize an array to store users id
+  const [stream, setStream] = useState();  // store stream info
+  const [receivingCall, setReceivingCall] = useState(false);  // store bool(true/false) of receiving call option
+  const [caller, setCaller] = useState("");  
   const [callerSignal, setCallerSignal] = useState(); 
   const [callAccepted, setCallAccepted] = useState(false); 
-  const [count, setCount] = useState(0); 
-  const [obj_count, setobj_count] = useState(0);  
-  const userVideo = useRef(); 
-  const partnerVideo = useRef(); 
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-  const socket = useRef(); 
-  const peerRef = useRef();
+  const [count, setCount] = useState(0); // for exception handling
+  const [obj_count, setobj_count] = useState(0); //for exception handling 
+  const userVideo = useRef();  // initialize to store user's video information
+  const partnerVideo = useRef(); // initialize to store 2nd user's video information
+  const [messages, setMessages] = useState([]); // object array of storing multiple messages
+  const [message, setMessage] = useState(""); // store 1 single chat message
+  const socket = useRef();  // initialize socket which will store socket informations 
+  const peerRef = useRef(); 
 
   
   useEffect(() => {
-    socket.current = io.connect("/");
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => { 
-      setStream(stream);
-      if (userVideo.current) {
+    socket.current = io.connect("/"); // connect with the backend server side socket
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {  // Get permission to use your camera and mic
+      setStream(stream); // if you granted permission, enable the streaming
+      if (userVideo.current) { // if your video is on, then show it, else initialize it will null
         userVideo.current.srcObject = stream;
       }
     })
 
 
-    socket.current.on("yourID", (id) => { 
-      setYourID(id);
+    socket.current.on("yourID", (id) => { // request an id from server side socket 
+      setYourID(id); // store it inside YourID using react hooks
     })
     
-    socket.current.on("allUsers", (users) => {
-      setUsers(users);
+    socket.current.on("allUsers", (users) => { // request to see who are online or who are wanting to connect with you via video call
+      setUsers(users); // store it inside the users array
     })
 
     socket.current.on("hey", (data) => {
@@ -137,12 +137,12 @@ function Loader() {
       setCallerSignal(data.signal);
     })
     
-    socket.current.on("message", (message) => {
-      console.log("here");
-      receivedMessage(message);
+    socket.current.on("message", (message) => {// handle message section calling server side socket
+      // console.log("here");
+      receivedMessage(message); // there is a function down below(155th line). If you found messages, call the backend function to marge it with the messages array
     })
 
-    socket.current.on("user left", () => {
+    socket.current.on("user left", () => {  // if any user left from the call, set receiving call false and destroy the session //
       setReceivingCall(false);
       setCaller("");
       setCallAccepted(false);
@@ -152,36 +152,36 @@ function Loader() {
   }, []);
   
 
-  function receivedMessage(message) {
+  function receivedMessage(message) { // push a message with the past messages and store it inside messages
     setMessages(oldMsgs => [...oldMsgs, message]);
   }
 
-  function sendMessage(e) {
-    e.preventDefault();
-    const messageObject = {
+  function sendMessage(e) { // initialize a message object with two objects(body and id) in it. Initialize those with live message and your current session id which is provided by socket //
+    e.preventDefault(); // prevent to refresh after one letter is inserted inside the chat box
+    const messageObject = { 
       body: message,
       id: yourID,
     };
-    setMessage("");
-    socket.current.emit("send message", messageObject);
+    setMessage(""); 
+    socket.current.emit("send message", messageObject); // request server to send the message
   }
 
-  function handleChange(e) {
+  function handleChange(e) { // if any letter is inserted into the chat area,make a call to change and push the typed characters inside the messages
     setMessage(e.target.value);
   }
 
-  function Exit() {
+  function Exit() { // if declined button is called, back to the home page destroing the session
     window.open("/", "_self");
     window.close();
   }
 
 
-  function callPeer(id) {
-      setobj_count(obj_count + 1);
-      console.log(obj_count);
-      if(obj_count === 0 ){
-        const peer = new Peer({
-          initiator: true,
+  function callPeer(id) { // Here P2P connection is established. 
+      setobj_count(obj_count + 1); // If one connection is establised, please increment the count
+      // console.log(obj_count);
+      if(obj_count === 0 ){ // if 0 connection established, open a connection 
+        const peer = new Peer({ // initialized a P2P connection
+          initiator: true, // Make it true from my end
           trickle: false,
           config: {
             iceServers: [
@@ -200,30 +200,30 @@ function Loader() {
           stream: stream,
         });
     
-        peer.on("signal", data => {
+        peer.on("signal", data => { // call the severside code using your information
           socket.current.emit("callUser", { userToCall: id, signalData: data, from: yourID })
         })
     
-        peer.on("stream", stream => {
+        peer.on("stream", stream => { // if partner's video is online, open the stream
           if (partnerVideo.current) {
             partnerVideo.current.srcObject = stream;
           }
         });
     
-        socket.current.on("callAccepted", signal => {
+        socket.current.on("callAccepted", signal => { // accept the call 
           setCallAccepted(true);
           peer.signal(signal);
         })
         peerRef.current = peer;
       }
       
-      else { 
+      else {  // if 2 people are already in a connection, if anyone else want to connect, make an exception calling network error //
         alert("network busy");
       }
     }
     
 
-  function acceptCall() {
+  function acceptCall() { // this is same as connection establishing
     
     setCallAccepted(true);
     const peer = new Peer({
@@ -251,14 +251,14 @@ function Loader() {
   let UserVideo;
   if (stream) {
     UserVideo = (
-      <Video playsInline muted ref={userVideo} autoPlay />
+      <Video playsInline muted ref={userVideo} autoPlay /> // integrate the video and mic with the stream(from user side)
     );
   }
 
   let PartnerVideo;
   if (callAccepted) {
     PartnerVideo = (
-      <Video playsInline ref={partnerVideo} autoPlay />
+      <Video playsInline ref={partnerVideo} autoPlay /> // integrate the video and mic with the stream(from partner side)
     );
   }
 
@@ -268,7 +268,7 @@ function Loader() {
         <div class="container">
         <div class="vertical-center">
             <h1>{caller} is calling you</h1>
-            <Button className="mb-2" size="lg" variant="success"  onClick={acceptCall}>Accept Call from {caller}</Button>
+            <Button className="mb-2" size="lg" variant="success"  onClick={acceptCall}>Accept Call from {caller}</Button> {/* Click the button to accept the call, calling acceptCall function */}
         </div>
       </div>
     )
@@ -284,12 +284,12 @@ function Loader() {
         {PartnerVideo} 
       </Row>
       <Row>
-        {Object.keys(users).map(key => { 
-          if (key === yourID) {
+        {Object.keys(users).map(key => { // mapped with users unique id that socket has provided //
+          if (key === yourID) { // if you are the same user then no extra key will be created because you are already online ///
             return null;
           }
           return (
-            <Button className="mb-2" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button> 
+            <Button className="mb-2" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button> // Make a call, calling callPeer function which will establish a P2P connection between you and your client ///
           );
         })}
       </Row>
@@ -299,19 +299,19 @@ function Loader() {
       
       <Row>
         <div>
-          <Button variant="danger" onClick={Exit}>Disconnect Browser</Button>
+          <Button variant="danger" onClick={Exit}>Disconnect Browser</Button> {/* Destroy Session  */}
         </div>
       </Row>
 
       <Row>
         <div>
-          <h1>𝓛𝓲𝓽𝓽𝓵𝓮 𝓒𝓱𝓪𝓽 𝓦𝓲𝓽𝓱 𝓤𝓼?</h1>
+          <h1>𝓛𝓲𝓽𝓽𝓵𝓮 𝓒𝓱𝓪𝓽 𝓦𝓲𝓽𝓱 𝓤𝓼?</h1> {/* Chat Section */}
           <div>
           <Page>
         <Container className="Message_Area">
           {messages.map((message, index) => {
-            if (message.id === yourID) {
-              console.log('Ok');
+            if (message.id === yourID) { // if your id is equal with the mapped message.id, then color, align will be on your side
+              // console.log('Ok');
               return (
                 <MyRow key={index}>
                   <MyMessage>
@@ -320,7 +320,7 @@ function Loader() {
                 </MyRow>
               )
             }
-            return (
+            return ( // if not, then it will be your parter's.. then color, align will be on the other side
               <PartnerRow key={index}>
                 <PartnerMessage>
                   {message.body}
@@ -329,7 +329,7 @@ function Loader() {
             )
           })}
         </Container>
-        <Form onSubmit={sendMessage}>
+        <Form onSubmit={sendMessage}> {/* Submit chat to send message */}
           <TextArea value={message} onChange={handleChange} placeholder="Say something..." />
           <Button onClick={sendMessage}><h3>Send</h3></Button>
         </Form>
@@ -345,3 +345,6 @@ function Loader() {
 }
 
 export default Loader;
+
+
+// That's All Sir. 

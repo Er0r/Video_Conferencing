@@ -12,8 +12,8 @@ io.on('connection', socket => {
     }
     socket.emit("yourID", socket.id);
     io.sockets.emit("allUsers", users);
-    socket.on('disconnect', () => {
-        delete users[socket.id];
+    socket.on('disconnect', () => { // if an user left from your software
+        delete users[socket.id]; // destrutoring an object 
     })
 
     socket.on("send message", body => {
