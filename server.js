@@ -8,7 +8,6 @@ const users = {};
 
 io.on('connection', socket => {
     if (!users[socket.id]) {
-        console.log('lok ashche, lok ashche');
         users[socket.id] = socket.id;
     }
     socket.emit("yourID", socket.id);

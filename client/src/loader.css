@@ -26,3 +26,13 @@
     margin-left: 20rem;
     float:left;
   }
+
+  .Message_Area {
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #2C3E50;
+  }
+
+  .body_container{
+    background-color: #F4D03F;
+  }

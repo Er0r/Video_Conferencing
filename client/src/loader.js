@@ -6,8 +6,6 @@ import Peer from "simple-peer";
 import styled from "styled-components";
 import Button from 'react-bootstrap/Button';
 import './loader.css';
-import { Link } from 'react-router-dom';
-
 
 const Page = styled.div`
   display: flex;
@@ -41,7 +39,7 @@ const TextArea = styled.textarea`
 const Container = styled.div`
   height: 100vh;
   width: 100%;
-  display: flex;
+  display: block;
   flex-direction: column;
 `;
 
@@ -51,9 +49,9 @@ const Row = styled.div`
 `;
 
 const Video = styled.video`
-  border: 1px solid blue;
+  border: 3px solid black;
   width: 50%;
-  height: 50%;
+  height: 70%;
 `;
 
 const Form = styled.form`
@@ -64,7 +62,7 @@ const MyRow = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin-top: 5px;
 `;
 
 const MyMessage = styled.div`
@@ -276,7 +274,11 @@ function Loader() {
     )
   }
   return (
-    <Container>
+    <div className="body_container">
+      <div>
+        <h1>𝔽𝕖𝕖𝕝 𝔽𝕣𝕖𝕖 𝕋𝕠 ℂ𝕠𝕟𝕟𝕖𝕔𝕥 𝕎𝕚𝕥𝕙 𝕌𝕤</h1>
+      </div>
+      <Container>
       <Row>
         {UserVideo}
         {PartnerVideo} 
@@ -294,33 +296,19 @@ function Loader() {
       <Row>
         {incomingCall} 
       </Row>
-      <Row> 
-        <Button variant="secondary" size="lg" active onClick={() => 
-        stream.getTracks().forEach((track) => { 
-            track.stop();
-        })}>
-             Decline Calling 
-        </Button>
-        </Row>
-
-        <Row>
-        <Button variant="secondary" size="lg" active>
-                <Link to="/" color="white">Back To The Main Page.</Link> 
-        </Button>
-      </Row>
       
       <Row>
         <div>
-          <Button onClick={Exit}>Disconnect Browser</Button>
+          <Button variant="danger" onClick={Exit}>Disconnect Browser</Button>
         </div>
       </Row>
 
       <Row>
         <div>
-          <h1>Hello, Want to Have a Little Talk With Us ?</h1>
+          <h1>𝓛𝓲𝓽𝓽𝓵𝓮 𝓒𝓱𝓪𝓽 𝓦𝓲𝓽𝓱 𝓤𝓼?</h1>
           <div>
           <Page>
-        <Container>
+        <Container className="Message_Area">
           {messages.map((message, index) => {
             if (message.id === yourID) {
               console.log('Ok');
@@ -351,6 +339,8 @@ function Loader() {
       </Row>
       
     </Container>
+
+    </div> 
   );
 }
 
