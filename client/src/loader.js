@@ -6,58 +6,129 @@ import Peer from "simple-peer";
 import styled from "styled-components";
 import Button from 'react-bootstrap/Button';
 import './loader.css';
-import Chat from './chat';
+import { Link } from 'react-router-dom';
+
+
+const Page = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+  background-color: #46516e;
+  flex-direction: column;
+`;
+
+const TextArea = styled.textarea`
+  width: 98%;
+  height: 100px;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  font-size: 17px;
+  background-color: transparent;
+  border: 1px solid lightgray;
+  outline: none;
+  color: lightgray;
+  letter-spacing: 1px;
+  line-height: 20px;
+  ::placeholder {
+    color: lightgray;
+  }
+`;
+
 // Some basic styling...
 const Container = styled.div`
-  height: 120vh;
+  height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #F4D03F;
 `;
 
 const Row = styled.div`
   display: flex;
   width: 100%;
-  margin: auto;
 `;
 
 const Video = styled.video`
-  border: 3px solid black;
+  border: 1px solid blue;
   width: 50%;
-  height: 80%;
+  height: 50%;
+`;
+
+const Form = styled.form`
+  width: 400px;
+`;
+
+const MyRow = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+`;
+
+const MyMessage = styled.div`
+  width: 45%;
+  background-color: #EB6A11;
+  color: black;
+  padding: 10px;
+  margin-right: 5px;
+  text-align: center;
+  border-top-right-radius: 10%;
+  border-bottom-right-radius: 10%;
+`;
+
+const PartnerRow = styled(MyRow)`
+  justify-content: flex-start;
+`;
+
+const PartnerMessage = styled.div`
+  width: 45%;
+  background-color: #B1B0AB ;
+  color: black;
+  border: 1px solid lightgray;
+  padding: 10px;
+  margin-left: 5px;
+  text-align: center;
+  border-top-left-radius: 10%;
+  border-bottom-left-radius: 10%;
 `;
 
 
+
 function Loader() {
+  const [yourID, setYourID] = useState();
   
-  const [yourID, setYourID] = useState(""); // React hooks is used to define random id's
-  const [users, setUsers] = useState({}); // React hooks for tracking the concurrent users
-  const [stream, setStream] = useState(); // React hooks is used to define steam data
+  const [users, setUsers] = useState({}); 
+  const [stream, setStream] = useState(); 
   const [receivingCall, setReceivingCall] = useState(false); 
   const [caller, setCaller] = useState(""); 
   const [callerSignal, setCallerSignal] = useState(); 
   const [callAccepted, setCallAccepted] = useState(false); 
-  const [count, setCount] = useState(0); // dummy to handle some exceptions
-  const [obj_count, setobj_count] = useState(0);  // dummy to handle some exceptions
+  const [count, setCount] = useState(0); 
+  const [obj_count, setobj_count] = useState(0);  
   const userVideo = useRef(); 
   const partnerVideo = useRef(); 
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
   const socket = useRef(); 
   const peerRef = useRef();
 
-  // useefect is the most vital part of this code. This part will execute first. So, firstly in this section, socket will get connected with media parts(camera,sound)//
+  
   useEffect(() => {
     socket.current = io.connect("/");
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => { // permission of audio and video call is established.
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => { 
       setStream(stream);
       if (userVideo.current) {
         userVideo.current.srcObject = stream;
       }
     })
 
-    socket.current.on("yourID", (id) => { // Here you have to use JWT key mapped with your authentication data. Use their name instead of using random id //
+
+    socket.current.on("yourID", (id) => { 
       setYourID(id);
     })
+    
     socket.current.on("allUsers", (users) => {
       setUsers(users);
     })
@@ -66,6 +137,11 @@ function Loader() {
       setReceivingCall(true);
       setCaller(data.from);
       setCallerSignal(data.signal);
+    })
+    
+    socket.current.on("message", (message) => {
+      console.log("here");
+      receivedMessage(message);
     })
 
     socket.current.on("user left", () => {
@@ -78,7 +154,23 @@ function Loader() {
   }, []);
   
 
-  
+  function receivedMessage(message) {
+    setMessages(oldMsgs => [...oldMsgs, message]);
+  }
+
+  function sendMessage(e) {
+    e.preventDefault();
+    const messageObject = {
+      body: message,
+      id: yourID,
+    };
+    setMessage("");
+    socket.current.emit("send message", messageObject);
+  }
+
+  function handleChange(e) {
+    setMessage(e.target.value);
+  }
 
   function Exit() {
     window.open("/", "_self");
@@ -110,8 +202,8 @@ function Loader() {
           stream: stream,
         });
     
-        peer.on("signal", data => { // Established P2P Connection
-          socket.current.emit("callUser", { userToCall: id, signalData: data, from: yourID }) // Initializer (Just call it as constructor value passing)
+        peer.on("signal", data => {
+          socket.current.emit("callUser", { userToCall: id, signalData: data, from: yourID })
         })
     
         peer.on("stream", stream => {
@@ -127,7 +219,7 @@ function Loader() {
         peerRef.current = peer;
       }
       
-      else { // If he isn't in the connection, show network busy or any interruption 
+      else { 
         alert("network busy");
       }
     }
@@ -144,7 +236,7 @@ function Loader() {
     peer.on("signal", data => {
       setCount(count+1);
       if(count === 0){
-        // console.log('Call is Accepted'+' '+ count);
+     
         socket.current.emit("acceptCall", { signal: data, to: caller })
       } else {
         console.log('You Have Already Accepted the Call');
@@ -186,32 +278,78 @@ function Loader() {
   return (
     <Container>
       <Row>
-        {UserVideo} {/* Your Video */}
-        {PartnerVideo} {/* Client's Video */}
+        {UserVideo}
+        {PartnerVideo} 
       </Row>
       <Row>
-        {Object.keys(users).map(key => { // Map it with your authentication information.
+        {Object.keys(users).map(key => { 
           if (key === yourID) {
             return null;
           }
           return (
-            <div>
-              <Button className="mb-2_call" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button>  {/* Call the function named callPeer*/}
-            </div>
+            <Button className="mb-2" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button> 
           );
         })}
       </Row>
       <Row>
-        <Button className="mb-2_exit" variant="danger" size="lg" onClick={Exit}>Declined Call</Button>
+        {incomingCall} 
       </Row>
-      <Row>
-        {incomingCall} {/* Show the upcoming Call Message */}
+      <Row> 
+        <Button variant="secondary" size="lg" active onClick={() => 
+        stream.getTracks().forEach((track) => { 
+            track.stop();
+        })}>
+             Decline Calling 
+        </Button>
+        </Row>
+
+        <Row>
+        <Button variant="secondary" size="lg" active>
+                <Link to="/" color="white">Back To The Main Page.</Link> 
+        </Button>
       </Row>
-      {/* ADD CLOSE BROWSER OPTION */}
+      
       <Row>
-        <Chat />
+        <div>
+          <Button onClick={Exit}>Disconnect Browser</Button>
+        </div>
       </Row>
 
+      <Row>
+        <div>
+          <h1>Hello, Want to Have a Little Talk With Us ?</h1>
+          <div>
+          <Page>
+        <Container>
+          {messages.map((message, index) => {
+            if (message.id === yourID) {
+              console.log('Ok');
+              return (
+                <MyRow key={index}>
+                  <MyMessage>
+                    {message.body}
+                  </MyMessage>
+                </MyRow>
+              )
+            }
+            return (
+              <PartnerRow key={index}>
+                <PartnerMessage>
+                  {message.body}
+                </PartnerMessage>
+              </PartnerRow>
+            )
+          })}
+        </Container>
+        <Form onSubmit={sendMessage}>
+          <TextArea value={message} onChange={handleChange} placeholder="Say something..." />
+          <Button onClick={sendMessage}><h3>Send</h3></Button>
+        </Form>
+    </Page>
+          </div>
+        </div>
+      </Row>
+      
     </Container>
   );
 }

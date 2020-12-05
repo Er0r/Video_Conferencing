@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import styled from "styled-components";
-const Page = styled.div`
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  align-items: center;
-  background-color: #46516e;
-  flex-direction: column;
-`;
+
 
 const Container = styled.div`
   display: flex;
@@ -24,93 +17,20 @@ const Container = styled.div`
   background-color:white;
 `;
 
-const TextArea = styled.textarea`
-  width: 98%;
-  height: 100px;
-  border-radius: 10px;
-  margin-top: 10px;
-  padding-left: 10px;
-  padding-top: 10px;
-  font-size: 17px;
-  background-color: transparent;
-  border: 1px solid lightgray;
-  outline: none;
-  color: lightgray;
-  letter-spacing: 1px;
-  line-height: 20px;
-  ::placeholder {
-    color: lightgray;
-  }
-`;
 
-const Button = styled.button`
-  background-color: white ;
-  width: 100%;
-  border: none;
-  height: 50px;
-  border-radius: 10px;
-  color: #46516e;
-  font-size: 17px;
-`;
 
-const Form = styled.form`
-  width: 400px;
-`;
 
-const MyRow = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-`;
 
-const MyMessage = styled.div`
-  width: 45%;
-  background-color: #EB6A11;
-  color: black;
-  padding: 10px;
-  margin-right: 5px;
-  text-align: center;
-  border-top-right-radius: 10%;
-  border-bottom-right-radius: 10%;
-`;
 
-const PartnerRow = styled(MyRow)`
-  justify-content: flex-start;
-`;
-
-const PartnerMessage = styled.div`
-  width: 45%;
-  background-color: #B1B0AB ;
-  color: black;
-  border: 1px solid lightgray;
-  padding: 10px;
-  margin-left: 5px;
-  text-align: center;
-  border-top-left-radius: 10%;
-  border-bottom-left-radius: 10%;
-`;
 
 
 function Chat(){
     const [yourID, setYourID] = useState();
-    const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState("");
+    
 
     const socketRef = useRef();
 
-    useEffect(() => {
-        socketRef.current = io.connect('/');
     
-        socketRef.current.on("yourID", id => {
-          setYourID(id);
-        })
-    
-        socketRef.current.on("message", (message) => {
-          console.log("here");
-          receivedMessage(message);
-        })
-      }, []);
 
       function receivedMessage(message) {
         setMessages(oldMsgs => [...oldMsgs, message]);

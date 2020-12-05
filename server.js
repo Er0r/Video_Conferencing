@@ -1,27 +1,24 @@
-/*
-Inside this Server, there is a simple integration code of socket.io
-
-*/
 const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
 const io = socket(server);
-
 const users = {};
 
-
-
-
-io.on('connection', socket => { // handle the event send with socket.send() from client side, Those are simple work handling post requests. You know those things better than me Sir
+io.on('connection', socket => {
     if (!users[socket.id]) {
+        console.log('lok ashche, lok ashche');
         users[socket.id] = socket.id;
     }
-    socket.emit("yourID", socket.id); // Just sent some custom id
-    io.sockets.emit("allUsers", users); 
-    socket.on('disconnect', () => { // 3 functions (disconnect, call and accept). those are the core part of socket.io
+    socket.emit("yourID", socket.id);
+    io.sockets.emit("allUsers", users);
+    socket.on('disconnect', () => {
         delete users[socket.id];
+    })
+
+    socket.on("send message", body => {
+        io.sockets.emit("message", body)
     })
 
     socket.on("callUser", (data) => {
@@ -31,10 +28,10 @@ io.on('connection', socket => { // handle the event send with socket.send() from
     socket.on("acceptCall", (data) => {
         io.to(data.to).emit('callAccepted', data.signal);
     })
-    socket.on("send message", body => {
-        io.emit("message", body)
-    })
 });
+
+
+
 
 server.listen(8000, () => console.log('server is running on port 8000')); // Server is up on localhost port 8000. You can change this with your own server port Sir
 
