@@ -10,21 +10,23 @@ import { Link } from 'react-router-dom';
 
 // Some basic styling...
 const Container = styled.div`
-  height: 100vh;
+  height: 120vh;
   width: 100%;
   display: flex;
   flex-direction: column;
+  background-color: #F4D03F;
 `;
 
 const Row = styled.div`
   display: flex;
   width: 100%;
+  margin: auto;
 `;
 
 const Video = styled.video`
-  border: 1px solid blue;
+  border: 3px solid black;
   width: 50%;
-  height: 50%;
+  height: 80%;
 `;
 
 
@@ -194,26 +196,20 @@ function Loader() {
             return null;
           }
           return (
-            <Button className="mb-2" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button> // Call the function named callPeer
+            <div>
+              <Button className="mb-2_call" size="lg" variant="success" onClick={() => callPeer(key)}>Call {key}</Button>  {/* Call the function named callPeer*/}
+            </div>
           );
         })}
       </Row>
       <Row>
+        <Button className="mb-2_exit" variant="danger" size="lg" onClick={Exit}>Declined Call</Button>
+      </Row>
+      <Row>
         {incomingCall} {/* Show the upcoming Call Message */}
       </Row>
-      
-
-        <Row>
-        <Button variant="secondary" size="lg" active>
-                <Link to="/" color="white">Back To The Main Page.</Link> {/* back to the previous page */}
-        </Button>
-      </Row>
       {/* ADD CLOSE BROWSER OPTION */}
-      <Row>
-        <div>
-          <Button onClick={Exit}>Disconnect Browser</Button>
-        </div>
-      </Row>
+      
 
     </Container>
   );

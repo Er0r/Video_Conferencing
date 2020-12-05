@@ -4,7 +4,7 @@ import './App.css';
 import { Link } from 'react-router-dom';
 import styled from "styled-components";
 import io from "socket.io-client";
-
+import './homepage.css';
 
 const Page = styled.div`
   display: flex;
@@ -22,10 +22,11 @@ const Container = styled.div`
   max-height: 500px;
   overflow: auto;
   width: 400px;
-  border: 1px solid lightgray;
+  border: 1px solid white;
   border-radius: 10px;
   padding-bottom: 10px;
   margin-top: 25px;
+  background-color:white;
 `;
 
 const TextArea = styled.textarea`
@@ -48,7 +49,7 @@ const TextArea = styled.textarea`
 `;
 
 const Button = styled.button`
-  background-color: pink;
+  background-color: white ;
   width: 100%;
   border: none;
   height: 50px;
@@ -70,8 +71,8 @@ const MyRow = styled.div`
 
 const MyMessage = styled.div`
   width: 45%;
-  background-color: pink;
-  color: #46516e;
+  background-color: #EB6A11;
+  color: black;
   padding: 10px;
   margin-right: 5px;
   text-align: center;
@@ -85,8 +86,8 @@ const PartnerRow = styled(MyRow)`
 
 const PartnerMessage = styled.div`
   width: 45%;
-  background-color: transparent;
-  color: lightgray;
+  background-color: #B1B0AB ;
+  color: black;
   border: 1px solid lightgray;
   padding: 10px;
   margin-left: 5px;
@@ -137,11 +138,11 @@ function Homepage() {
       }
 
     return (
-        <div>
+        <div className="homepage">
             <h1> Hello, Welcome</h1>
             <div className="mb-2">
                 <Button variant="secondary" size="lg" active>
-                    <Link to="/load" color="white">Contact With Us.</Link>
+                   <h2> <Link to="/load" color="black">Contact Via Video Call. 📷</Link> </h2>
                 </Button>
             </div>
             <div>
@@ -168,7 +169,7 @@ function Homepage() {
       </Container>
       <Form onSubmit={sendMessage}>
         <TextArea value={message} onChange={handleChange} placeholder="Say something..." />
-        <Button>Send</Button>
+        <Button><h3>Send</h3></Button>
       </Form>
     </Page>
 
