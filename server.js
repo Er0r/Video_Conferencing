@@ -4,7 +4,7 @@ const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
 const io = socket(server);
-const users = {};
+const users = {}; // array 
 
 io.on('connection', socket => {
     if (!users[socket.id]) {

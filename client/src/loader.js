@@ -218,7 +218,7 @@ function Loader() {
       }
       
       else {  // if 2 people are already in a connection, if anyone else want to connect, make an exception calling network error //
-        alert("network busy");
+        alert("Busy! Please Try again!");
       }
     }
     
